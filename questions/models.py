@@ -1,16 +1,6 @@
+import django.contrib.auth.models
 from django.db import models
 
-
-
-class User(models.Model):
-    pseudonym = models.CharField(max_length=40, primary_key=True)
-    POSITIONS = (
-        ('user', 'Пользователь'),
-        ('developer', 'Разработчик'),
-    )
-    position = models.CharField(max_length=15, choices=POSITIONS)
-    name = models.CharField(max_length=30)
-    surname = models.CharField(max_length=30)
 
 
 class Category(models.Model):
@@ -19,20 +9,17 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    author
-    category
-    answer
+    author = models.ForeignKey(django.contrib.auth.models.User, on_delete = models.CASCADE)
+    category = models.ManyToManyField(Category)
+    answer = models.OneToOneField('Answer')
     text_of_question = models.TextField()
 
 
 class Comment(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    author
-    question
+    author = models.ForeignKey(django.contrib.auth.models.User, on_delete = models.CASCADE)
+    question = models.ForeignKey(Question)
     text_of_comment = models.TextField()
 
 class Answer(models.Model):
-    author
-    question
+    author = models.ForeignKey(django.contrib.auth.models.User, on_delete = models.CASCADE)
     text_of_answer = models.TextField()
