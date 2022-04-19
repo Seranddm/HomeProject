@@ -1,6 +1,6 @@
 import django.contrib.auth.models
 from django.db import models
-
+from django.urls import reverse
 
 
 class Category(models.Model):
@@ -27,6 +27,9 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Вопрос'   # Имя модели в единственном числе
         verbose_name_plural = 'Вопросы'   # Имя модели во множественном числе
+
+    def get_absolute_url(self):
+        return reverse('questionDetail', args=[str(self.id)])
 
 
 class Comment(models.Model):

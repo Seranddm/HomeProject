@@ -1,6 +1,9 @@
-from django.urls import path
-from .views import QurestionList
+from django.urls import path, re_path
+from .views import QuestionList, QuestionDetail
+
 
 urlpatterns = [
-    path('', QurestionList.as_view(), name='questionList')
+    path('', QuestionList.as_view(), name='questionList'),
+    re_path(r'^(?P<pk>\d+)$', QuestionDetail.as_view(), name='questionDetail'),
+
 ]

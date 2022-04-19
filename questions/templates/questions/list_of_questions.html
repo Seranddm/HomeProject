@@ -7,18 +7,14 @@
 {% block content %}
 {% for question in questions %}
     <div>
-        <h2>{{ question.text_of_question }}</h2>
+        <a href="{{ question.get_absolute_url }}"><h2>{{ question.text_of_question }}</h2></a>
+
         <p>{{ question.author }}</p>
 
         {% if question.answer %}
             <p>{{ question.answer }}</p>
             <p>{{ question.answer.author }}</p>
         {% endif %}
-
-        {% for comment in question.comments.all %}
-            <p>{{ comment }}</p>
-            <p>{{ comment.author }}</p>
-        {% endfor %}
     </div>
 {% endfor %}
 {% endblock %}

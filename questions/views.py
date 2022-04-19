@@ -1,10 +1,10 @@
 from django.shortcuts import render
 
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from .models import Question
 
 
-class QurestionList(ListView):
+class QuestionList(ListView):
     model = Question
     context_object_name = 'questions'  # поменял переменную контекста (пока даст все объекты)
     template_name = 'questions/list_of_questions.html'  # поменял имя шаблона
@@ -13,5 +13,13 @@ class QurestionList(ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Список вопросов'   # Дополнительная переменная
         return context
+
+
+class QuestionDetail(DetailView):
+    model = Question
+    context_object_name = 'question'
+    template_name = 'questions/one_question.html'  # поменял имя шаблона
+
+
 
 
