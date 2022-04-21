@@ -1,20 +1,25 @@
-{% extends 'base.html' %}
+{% extends 'questions/base.html' %}
 
 {% block title %}
-{{ title }}
+    {{ title }}
 {% endblock %}
 
 {% block content %}
-{% for question in questions %}
-    <div>
-        <a href="{{ question.get_absolute_url }}"><h2>{{ question.text_of_question }}</h2></a>
-
-        <p>{{ question.author }}</p>
-
-        {% if question.answer %}
-            <p>{{ question.answer }}</p>
-            <p>{{ question.answer.author }}</p>
-        {% endif %}
-    </div>
-{% endfor %}
+    {% for question in questions %}
+        <div class="card quest-card">
+            <div class="card-header">Автор: {{ question.author }}</div>
+            <div class="card-body">
+                <a class="quest-text" href="{{ question.get_absolute_url }}"><h2
+                        class="card-title">{{ question.text_of_question }}</h2></a>
+                <div class="card">
+                    {% if question.answer %}
+                        <div class="card-header">Автор: {{ question.answer.author }}</div>
+                        <div class="card-body">
+                            <div class="card-text"><h4>{{ question.answer }}</h4></div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

@@ -1,24 +1,47 @@
-{% extends 'base.html' %}
+{% extends 'questions/base.html' %}
 
 {% block title %}
-Вопрос номер {{ question.id }}
+    Вопрос номер {{ question.id }}
 {% endblock %}
 
 {% block content %}
-<div>
-    <h1>{{ question.text_of_question }}</h1>
-    <p>Автор: {{ question.author }}</p>
-    <p>Ответ на вопрос: {{ question.answer }}</p>
-    <p>Автор: {{question.answer.author }}</p>
-    <h4>Комментарии:</h4>
-    {% if question.comments.all.count == 0 %}
-        <p>Пока нет комментариев</p>
-    {% else %}
-    {% for comment in question.comments.all %}
-        <p>{{ comment.text_of_comment }}</p>
-        <p>{{ comment.author }}</p>
-    {% endfor %}
-    {% endif %}
+    <div>
+        <div class="card">
+            <div class="card-body">
+                <h1>{{ question.text_of_question }}</h1>
+                <p>Автор: {{ question.author }}</p>
+                <div class="card">
+                    <div class="card-header">Ответ на вопрос:</div>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <h4>{{ question.answer }}</h4>
+                            <p>Автор: {{ question.answer.author }}</p>
+                        </div>
+                    </div>
+                </div>
 
-</div>
+            </div>
+        </div>
+        <h4 class="comment-title">Комментарии:</h4>
+        {% if not question.comment_exist %}
+            <p>Пока нет комментариев</p>
+        {% else %}
+            {% for comment in question.comments.all %}
+                <div class="card comment-card">
+                    <div class="card-header">{{ comment.author }}</div>
+                    <div class="card-body">
+                        <div class="card-text"><h5>{{ comment.text_of_comment }}</h5></div>
+                    </div>
+
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <p>Категории:
+            {% for category in categories %}
+                <a href="" class="categ-link">{{ category }}</a>
+            {% endfor %}
+        </p>
+
+    </div>
 {% endblock %}

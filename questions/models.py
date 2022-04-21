@@ -27,9 +27,14 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Вопрос'   # Имя модели в единственном числе
         verbose_name_plural = 'Вопросы'   # Имя модели во множественном числе
+        unique_together = ('author', 'text_of_question')
 
     def get_absolute_url(self):
         return reverse('questionDetail', args=[str(self.id)])
+
+    def comment_exist(self):
+        """ Проверка наличия комментов """
+        return self.comments.exists()
 
 
 class Comment(models.Model):

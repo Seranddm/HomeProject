@@ -20,6 +20,13 @@ class QuestionDetail(DetailView):
     context_object_name = 'question'
     template_name = 'questions/one_question.html'  # поменял имя шаблона
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # переменная со списоком категорий
+        context['categories'] = context['question'].category.all().values_list('name', flat=True)
+        return context
+
+
 
 
 
