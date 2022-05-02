@@ -16,7 +16,7 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-    author = models.ForeignKey(django.contrib.auth.models.User, default='User', on_delete = models.SET_DEFAULT, verbose_name='Автор')
+    author = models.ForeignKey(django.contrib.auth.models.User, on_delete = models.SET_NULL, verbose_name='Автор', blank=True, null=True)
     category = models.ManyToManyField(Category, related_name='questions', verbose_name='Категория')
     answer = models.OneToOneField('Answer', null=True , blank=True ,on_delete = models.SET_NULL)
     text_of_question = models.TextField(verbose_name='Текст вопроса')
@@ -27,7 +27,7 @@ class Question(models.Model):
     class Meta:
         verbose_name = 'Вопрос'   # Имя модели в единственном числе
         verbose_name_plural = 'Вопросы'   # Имя модели во множественном числе
-        unique_together = ('author', 'text_of_question')
+        unique_together = (('author', 'text_of_question'), ('text_of_question', 'answer'))
 
     def get_absolute_url(self):
         return reverse('questionDetail', args=[str(self.id)])
@@ -38,8 +38,7 @@ class Question(models.Model):
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(django.contrib.auth.models.User, default='User', on_delete = models.SET_DEFAULT,
-                               verbose_name='Автор')
+    author = models.ForeignKey(django.contrib.auth.models.User, on_delete = models.SET_NULL, verbose_name='Автор', blank=True, null=True)
     question = models.ForeignKey(Question, on_delete = models.CASCADE, related_name='comments', verbose_name='Вопрос')
     text_of_comment = models.TextField(verbose_name='Текст комментария')
 
@@ -51,8 +50,7 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'   # Имя модели во множественном числе
 
 class Answer(models.Model):
-    author = models.ForeignKey(django.contrib.auth.models.User, default='User', on_delete = models.SET_DEFAULT,
-                               verbose_name='Автор')
+    author = models.ForeignKey(django.contrib.auth.models.User, on_delete = models.SET_NULL, verbose_name='Автор', blank=True, null=True)
     text_of_answer = models.TextField(verbose_name='Текст ответа')
 
     def __str__(self):

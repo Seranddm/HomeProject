@@ -1,7 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-from django.views.generic import ListView, DetailView
-from .models import Question
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from .models import Question, Answer, Comment
+from .forms import CreateQuestionForm, CreateAnswerForm, CreateCommentForm
+
+from django.urls import reverse_lazy
 
 
 class QuestionList(ListView):
@@ -11,7 +14,7 @@ class QuestionList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Список вопросов'   # Дополнительная переменная
+        context['title'] = 'Список вопросов'  # Дополнительная переменная
         return context
 
 
@@ -27,6 +30,50 @@ class QuestionDetail(DetailView):
         return context
 
 
+class AddQuestion(CreateView):
+    form_class = CreateQuestionForm
+    template_name = 'questions/create_question.html'
 
 
+def AddAnswer(request, pk):
+    if request.method == 'POST':
+        form = CreateAnswerForm(request.POST)
+        if form.is_valid():
+            answer = Answer.objects.create(**form.cleaned_data)
+            # связываю вопрос с ответом
+            question = Question.objects.get(pk=pk)
+            question.answer = answer
+            question.save()
+        return redirect('questionList')
+    else:
+        form = CreateAnswerForm()
+    return render(request, 'questions/create_answer.html', {'form': form})
 
+
+def AddComment(request, pk):
+    # form_class = CreateCommentForm
+    # template_name = 'questions/create_comment.html'
+    # success_url = reverse_lazy('questionList')
+    if request.method == 'POST':
+        form = CreateCommentForm(request.POST)
+        if form.is_valid():
+            # связываю вопрос с комментом
+            question = Question.objects.get(pk=pk)
+            form.cleaned_data['question'] = question
+            comment = Comment.objects.create(**form.cleaned_data)
+        return redirect('questionList')
+    else:
+        form = CreateCommentForm()
+    return render(request, 'questions/create_comment.html', {'form': form})
+
+
+class UpdateQuestion(UpdateView):
+    model = Question
+    fields = ['category', 'text_of_question', 'answer']
+    template_name = 'questions/update_question.html'
+
+
+class DeleteQuestion(DeleteView):
+    model = Question
+    template_name = 'questions/delete_question.html'
+    success_url = reverse_lazy('questionList')

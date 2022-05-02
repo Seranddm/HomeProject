@@ -6,29 +6,58 @@
 
 {% block content %}
     <div>
+        <p>Категории:
+            {% for category in categories %}
+                <a href="" class="categ-link">{{ category }}</a>
+            {% endfor %}
+        </p>
+        <a href="{% url 'updateQuestion' question.pk %}">Редактировать вопрос</a>
+        <a href="{% url 'deleteQuestion' question.pk %}">Удалить вопрос</a>
         <div class="card">
             <div class="card-body">
                 <h1>{{ question.text_of_question }}</h1>
-                <p>Автор: {{ question.author }}</p>
-                <div class="card">
-                    <div class="card-header">Ответ на вопрос:</div>
-                    <div class="card-body">
-                        <div class="card-text">
-                            <h4>{{ question.answer }}</h4>
-                            <p>Автор: {{ question.answer.author }}</p>
+                <p>Автор:
+                    {% if question.author %}
+                        {{ question.author }}
+                    {% else %}
+                        Анонимный автор
+                    {% endif %}
+                </p>
+                {% if question.answer %}
+                    <div class="card">
+                        <div class="card-header">Ответ на вопрос:</div>
+                        <div class="card-body">
+                            <div class="card-text">
+                                <h4>{{ question.answer }}</h4>
+                                <p>Автор:
+                                    {% if question.answer.author %}
+                                        {{ question.answer.author }}
+                                    {% else %}
+                                        Анонимный автор
+                                    {% endif %}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-
+                {% else %}
+                    <a href="{% url 'addAnswer' question.pk %}">Добавить ответ</a>
+                {% endif %}
             </div>
         </div>
         <h4 class="comment-title">Комментарии:</h4>
+        <a href="{% url 'addComment' question.pk %}">Добавить комментарий</a>
         {% if not question.comment_exist %}
             <p>Пока нет комментариев</p>
         {% else %}
             {% for comment in question.comments.all %}
                 <div class="card comment-card">
-                    <div class="card-header">{{ comment.author }}</div>
+                    <div class="card-header">
+                        {% if comment.author %}
+                            {{ comment.author }}
+                        {% else %}
+                            Анонимный автор
+                        {% endif %}
+                    </div>
                     <div class="card-body">
                         <div class="card-text"><h5>{{ comment.text_of_comment }}</h5></div>
                     </div>
@@ -37,11 +66,6 @@
             {% endfor %}
         {% endif %}
 
-        <p>Категории:
-            {% for category in categories %}
-                <a href="" class="categ-link">{{ category }}</a>
-            {% endfor %}
-        </p>
 
     </div>
 {% endblock %}

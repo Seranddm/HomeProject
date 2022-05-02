@@ -1,0 +1,15 @@
+{% extends 'questions/base.html' %}
+
+{% block title %}
+    Удаление вопроса
+{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>Удалить вопрос: {{ object.text_of_question }}?</p>
+        <button type="submit">Удалить вопрос</button>
+    </form>
+
+{% endblock %}

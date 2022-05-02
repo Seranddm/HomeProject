@@ -7,19 +7,35 @@
 {% block content %}
     {% for question in questions %}
         <div class="card quest-card">
-            <div class="card-header">Автор: {{ question.author }}</div>
+            <div class="card-header">Автор:
+                {% if question.author %}
+                    {{ question.author }}
+                {% else %}
+                    Анонимный автор
+                {% endif %}
+            </div>
             <div class="card-body">
                 <a class="quest-text" href="{{ question.get_absolute_url }}"><h2
                         class="card-title">{{ question.text_of_question }}</h2></a>
-                <div class="card">
-                    {% if question.answer %}
-                        <div class="card-header">Автор: {{ question.answer.author }}</div>
+                {% if question.answer %}
+                    <div class="card">
+                        <div class="card-header">Автор:
+                            {% if question.answer.author %}
+                                {{ question.answer.author }}
+                            {% else %}
+                                Анонимный автор
+                            {% endif %}
+                        </div>
                         <div class="card-body">
                             <div class="card-text"><h4>{{ question.answer }}</h4></div>
                         </div>
-                    {% endif %}
-                </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     {% endfor %}
+{% endblock %}
+
+{% block nav_ref %}
+    <a href="{% url 'addQuestion' %}">Добавить вопрос</a>
 {% endblock %}

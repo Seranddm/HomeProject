@@ -1,0 +1,15 @@
+{% extends 'questions/base.html' %}
+
+{% block title %}
+    Обновление вопроса
+{% endblock %}
+
+{% block content %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+<button type="submit">Обновить вопрос</button>
+</form>
+
+{% endblock %}
