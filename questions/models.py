@@ -14,6 +14,9 @@ class Category(models.Model):
         verbose_name = 'Категория'   # Имя модели в единственном числе
         verbose_name_plural = 'Категории'   # Имя модели во множественном числе
 
+    def get_absolute_url(self):
+        return reverse('categoryDetail', args=[str(self.id)])
+
 
 class Question(models.Model):
     author = models.ForeignKey(django.contrib.auth.models.User, on_delete = models.SET_NULL, verbose_name='Автор', blank=True, null=True)

@@ -4,7 +4,7 @@ from .models import Question, Answer, Comment
 class CreateQuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['category', 'text_of_question', 'answer']
+        fields = ['category', 'text_of_question']
 
 
 class CreateAnswerForm(forms.ModelForm):

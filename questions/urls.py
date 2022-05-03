@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import QuestionList, QuestionDetail, AddQuestion, AddAnswer, AddComment, UpdateQuestion, DeleteQuestion
-
+from .views import QuestionList, QuestionDetail, AddQuestion, AddAnswer, AddComment, UpdateQuestion, DeleteQuestion, \
+    CategoryDetail
 
 urlpatterns = [
     path('', QuestionList.as_view(), name='questionList'),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('add_comment/<int:pk>/', AddComment, name='addComment'),
     path('update_question/<int:pk>/', UpdateQuestion.as_view(), name='updateQuestion'),
     path('delete_question/<int:pk>/', DeleteQuestion.as_view(), name='deleteQuestion'),
+    path('category/<int:pk>/', CategoryDetail.as_view(), name='categoryDetail'),
 ]

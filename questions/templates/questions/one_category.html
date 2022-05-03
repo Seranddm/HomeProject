@@ -1,17 +1,15 @@
 {% extends 'questions/base.html' %}
 
 {% block title %}
-    {{ title }}
+    Категория {{ category.name }}
 {% endblock %}
 
 {% block content %}
     <div>
-    Все категории:
-    {% for cat in categories %}
-        <a href="{{ cat.get_absolute_url }}">{{ cat }}</a>
-    {% endfor %}
+        <p>Категория {{ category }}</p>
+        <p>Краткая информация: {{ category.info }}</p>
     </div>
-    {% for question in questions %}
+    {% for question in category.questions.all %}
         <div class="card quest-card">
             <div class="card-header">Автор:
                 {% if question.author %}
@@ -40,8 +38,4 @@
             </div>
         </div>
     {% endfor %}
-{% endblock %}
-
-{% block nav_ref %}
-    <a href="{% url 'addQuestion' %}">Добавить вопрос</a>
 {% endblock %}
