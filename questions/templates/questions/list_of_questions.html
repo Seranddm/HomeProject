@@ -4,13 +4,58 @@
     {{ title }}
 {% endblock %}
 
+
+{% block navbar %}
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'questionList' %}">Все вопросы</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavDropdown"
+                    aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'addQuestion' %}">Добавить вопрос</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Категории
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            {% for cat in categories %}
+                                <li><a class="dropdown-item" href="{{ cat.get_absolute_url }}">{{ cat }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <span class="navbar-text">
+                                Добро пожаловать, {{ user.username }}
+                            </span>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Зарегистрироваться</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Войти</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+
+
 {% block content %}
-    <div>
-    Все категории:
-    {% for cat in categories %}
-        <a href="{{ cat.get_absolute_url }}">{{ cat }}</a>
-    {% endfor %}
-    </div>
     {% for question in questions %}
         <div class="card quest-card">
             <div class="card-header">Автор:
@@ -40,8 +85,4 @@
             </div>
         </div>
     {% endfor %}
-{% endblock %}
-
-{% block nav_ref %}
-    <a href="{% url 'addQuestion' %}">Добавить вопрос</a>
 {% endblock %}

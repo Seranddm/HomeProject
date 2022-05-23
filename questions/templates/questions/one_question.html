@@ -11,8 +11,10 @@
                 <a href="{{ category.get_absolute_url }}" class="categ-link">{{ category }}</a>
             {% endfor %}
         </p>
-        <a href="{% url 'updateQuestion' question.pk %}">Редактировать вопрос</a>
-        <a href="{% url 'deleteQuestion' question.pk %}">Удалить вопрос</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'updateQuestion' question.pk %}">Редактировать вопрос</a>
+            <a href="{% url 'deleteQuestion' question.pk %}">Удалить вопрос</a>
+        {% endif %}
         <div class="card">
             <div class="card-body">
                 <h1>{{ question.text_of_question }}</h1>
@@ -45,7 +47,9 @@
             </div>
         </div>
         <h4 class="comment-title">Комментарии:</h4>
-        <a href="{% url 'addComment' question.pk %}">Добавить комментарий</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'addComment' question.pk %}">Добавить комментарий</a>
+        {% endif %}
         {% if not question.comment_exist %}
             <p>Пока нет комментариев</p>
         {% else %}
