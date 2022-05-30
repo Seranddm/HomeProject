@@ -5,9 +5,12 @@ from django.contrib.auth.models import User
 
 
 class CreateQuestionForm(forms.ModelForm):
+    is_published = forms.BooleanField(label='Опубликовать вопрос? Если нет, то он будет сохранен в черновиках.',
+                                      required=False)
+
     class Meta:
         model = Question
-        fields = ['category', 'text_of_question']
+        fields = ['category', 'text_of_question', 'is_published']
 
 
 class CreateAnswerForm(forms.ModelForm):

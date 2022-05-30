@@ -1,9 +1,8 @@
 {% extends 'questions/base.html' %}
 
 {% block title %}
-    {{ title }}
+    Личный кабинет
 {% endblock %}
-
 
 {% block navbar %}
     <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark" style="width: 100%;">
@@ -21,17 +20,6 @@
                             <a class="nav-link" href="{% url 'addQuestion' %}">Добавить вопрос</a>
                         </li>
                     {% endif %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            Категории
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            {% for cat in categories %}
-                                <li><a class="dropdown-item" href="{{ cat.get_absolute_url }}">{{ cat }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </li>
                     {% if user.is_authenticated %}
                         <span class="navbar-text">
                                 Добро пожаловать, {{ user.username }}
@@ -40,7 +28,8 @@
                             <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'personal-area' %}">Личный кабинет</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'personal-area' %}">Личный
+                                кабинет</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
@@ -56,36 +45,42 @@
     </nav>
 {% endblock %}
 
-
-
 {% block content %}
-    {% for question in questions %}
-        <div class="card quest-card">
-            <div class="card-header">Автор:
-                {% if question.author %}
-                    {{ question.author }}
-                {% else %}
-                    Анонимный автор
-                {% endif %}
-            </div>
-            <div class="card-body">
-                <a class="quest-text" href="{{ question.get_absolute_url }}"><h2
-                        class="card-title">{{ question.text_of_question }}</h2></a>
-                {% if question.answer %}
-                    <div class="card">
-                        <div class="card-header">Автор:
-                            {% if question.answer.author %}
-                                {{ question.answer.author }}
-                            {% else %}
-                                Анонимный автор
-                            {% endif %}
+    <p>Все вопросы</p>
+    {% if questions %}
+        {% for question in questions %}
+            <div class="card quest-card">
+                <div class="card-header">Автор:
+                    {% if question.author %}
+                        {{ question.author }}
+                    {% else %}
+                        Анонимный автор
+                    {% endif %}
+                    {% if not question.is_published %}
+                        <a href="{% url 'publish_question' question.pk %}">Опубликовать</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <a class="quest-text" href="{{ question.get_absolute_url }}"><h2
+                            class="card-title">{{ question.text_of_question }}</h2></a>
+                    {% if question.answer %}
+                        <div class="card">
+                            <div class="card-header">Автор:
+                                {% if question.answer.author %}
+                                    {{ question.answer.author }}
+                                {% else %}
+                                    Анонимный автор
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <div class="card-text"><h4>{{ question.answer }}</h4></div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="card-text"><h4>{{ question.answer }}</h4></div>
-                        </div>
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    {% else %}
+        <p>Пока вы не задали ни одного вопроса</p>
+    {% endif %}
 {% endblock %}

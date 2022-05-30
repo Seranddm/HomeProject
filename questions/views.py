@@ -7,12 +7,17 @@ from django.views.generic.detail import SingleObjectMixin
 
 from django.urls import reverse_lazy
 from django.contrib.auth import login, logout
+from django.contrib.auth.models import Group
 
 
 class QuestionList(ListView):
     model = Question
     context_object_name = 'questions'  # поменял переменную контекста (пока даст все объекты)
     template_name = 'questions/list_of_questions.html'  # поменял имя шаблона
+
+    def get_queryset(self):
+        # Показываю только опубликованные вопросы
+        return Question.objects.filter(is_published=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -33,7 +38,7 @@ class QuestionDetail(DetailView):
         return context
 
 
-#class AddQuestion(CreateView):
+# class AddQuestion(CreateView):
 #    form_class = CreateQuestionForm
 #    template_name = 'questions/create_question.html'
 
@@ -45,6 +50,7 @@ def AddQuestion(request):
             question = Question.objects.create()
             question.category.set(form.cleaned_data['category'])
             question.text_of_question = form.cleaned_data['text_of_question']
+            question.is_published = form.cleaned_data['is_published']
             # связываю автора с вопросом
             question.author = request.user
             question.save()
@@ -53,7 +59,6 @@ def AddQuestion(request):
     else:
         form = CreateQuestionForm()
     return render(request, 'questions/create_question.html', {'form': form})
-
 
 
 def AddAnswer(request, pk):
@@ -97,9 +102,35 @@ class UpdateQuestion(UpdateView):
     template_name = 'questions/update_question.html'
 
 
+class UpdateAnswer(UpdateView):
+    model = Answer
+    fields = ['text_of_answer']
+    template_name = 'questions/update_answer.html'
+    success_url = reverse_lazy('questionList')
+
+
+class UpdateComment(UpdateView):
+    model = Comment
+    fields = ['text_of_comment']
+    template_name = 'questions/update_comment.html'
+    success_url = reverse_lazy('questionList')
+
+
 class DeleteQuestion(DeleteView):
     model = Question
     template_name = 'questions/delete_question.html'
+    success_url = reverse_lazy('questionList')
+
+
+class DeleteAnswer(DeleteView):
+    model = Answer
+    template_name = 'questions/delete_answer.html'
+    success_url = reverse_lazy('questionList')
+
+
+class DeleteComment(DeleteView):
+    model = Comment
+    template_name = 'questions/delete_comment.html'
     success_url = reverse_lazy('questionList')
 
 
@@ -113,12 +144,15 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            # Каждый зарегистрированный пользователь - Обычный
+            # Остальные регистрируются через админку
+            user.groups.add(Group.objects.get(name='Обычный пользователь'))
             return redirect('login')
 
     else:
         form = UserRegisterForm()
-    return render(request, 'questions/register.html', {'form' : form})
+    return render(request, 'questions/register.html', {'form': form})
 
 
 def user_login(request):
@@ -131,9 +165,27 @@ def user_login(request):
 
     else:
         form = UserLoginForm()
-    return render(request, 'questions/login.html', {'form' : form})
+    return render(request, 'questions/login.html', {'form': form})
 
 
 def user_logout(request):
     logout(request)
     return redirect('questionList')
+
+
+class PersonalArea(ListView):
+    model = Question
+    context_object_name = 'questions'  # поменял переменную контекста (пока даст все объекты)
+    template_name = 'questions/personal_area.html'  # поменял имя шаблона
+
+    def get_queryset(self):
+        # Показываю вопросы конкретного пользователя
+        return Question.objects.filter(author=self.request.user)
+
+
+def publish_question(request, pk):
+    # для опубликования вопроса из черновиков
+    question = Question.objects.get(pk=pk)
+    question.is_published = True
+    question.save()
+    return redirect('personal-area')

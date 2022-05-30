@@ -1,0 +1,15 @@
+{% extends 'questions/base.html' %}
+
+{% block title %}
+    Удаление комментария
+{% endblock %}
+
+{% block content %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>Удалить комментарий: « {{ object.text_of_comment }} » ?</p>
+        <button type="submit">Удалить комментарий</button>
+    </form>
+
+{% endblock %}

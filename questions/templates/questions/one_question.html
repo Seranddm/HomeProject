@@ -11,10 +11,15 @@
                 <a href="{{ category.get_absolute_url }}" class="categ-link">{{ category }}</a>
             {% endfor %}
         </p>
-        {% if user.is_authenticated %}
+
+        {% if perms.questions.can_update_question and question.author == user or user.is_superuser %}
             <a href="{% url 'updateQuestion' question.pk %}">Редактировать вопрос</a>
+        {% endif %}
+
+        {% if perms.questions.can_delete_question %}
             <a href="{% url 'deleteQuestion' question.pk %}">Удалить вопрос</a>
         {% endif %}
+
         <div class="card">
             <div class="card-body">
                 <h1>{{ question.text_of_question }}</h1>
@@ -41,15 +46,26 @@
                             </div>
                         </div>
                     </div>
+                    {% if perms.questions.can_update_answer and question.answer.author == user or user.is_superuser %}
+                        <a href="{% url 'updateAnswer' question.answer.pk %}">Редактировать ответ</a>
+                    {% endif %}
+                    {% if perms.questions.can_delete_answer %}
+                        <a href="{% url 'deleteAnswer' question.answer.pk %}">Удалить ответ</a>
+                    {% endif %}
                 {% else %}
-                    <a href="{% url 'addAnswer' question.pk %}">Добавить ответ</a>
+                    <p>Ответа на вопрос пока нет</p>
+                    {% if perms.questions.can_create_answer %}
+                        <a href="{% url 'addAnswer' question.pk %}">Добавить ответ</a>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
         <h4 class="comment-title">Комментарии:</h4>
-        {% if user.is_authenticated %}
+
+        {% if perms.questions.can_create_comment %}
             <a href="{% url 'addComment' question.pk %}">Добавить комментарий</a>
         {% endif %}
+
         {% if not question.comment_exist %}
             <p>Пока нет комментариев</p>
         {% else %}
@@ -64,6 +80,14 @@
                     </div>
                     <div class="card-body">
                         <div class="card-text"><h5>{{ comment.text_of_comment }}</h5></div>
+
+                        {% if perms.questions.can_update_comment and comment.author == user or user.is_superuser %}
+                            <a href="{% url 'updateComment' comment.pk %}">Редактировать комментарий</a>
+                        {% endif %}
+
+                        {% if perms.questions.can_delete_comment %}
+                            <a href="{% url 'deleteComment' comment.pk %}">Удалить комментарий</a>
+                        {% endif %}
                     </div>
 
                 </div>

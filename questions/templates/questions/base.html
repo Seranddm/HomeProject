@@ -11,43 +11,48 @@
 </head>
 <body>
 
-<div class="main-container">
-    {% block navbar %}
-        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="{% url 'questionList' %}">Все вопросы</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarNavDropdown"
-                        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                    <ul class="navbar-nav">
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'addQuestion' %}">Добавить вопрос</a>
-                            </li>
-                            <span class="navbar-text">
+
+{% block navbar %}
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark" style="width: 100%;">
+        <div class="container-fluid" style="max-width: 1024px; margin: auto;">
+            <a class="navbar-brand" href="{% url 'questionList' %}">Все вопросы</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavDropdown"
+                    aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    {% if perms.questions.can_create_question %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'addQuestion' %}">Добавить вопрос</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <span class="navbar-text">
                                 Добро пожаловать, {{ user.username }}
                             </span>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'register' %}">Зарегистрироваться</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">Войти</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'personal-area' %}">Личный кабинет</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Зарегистрироваться</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Войти</a>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
-        </nav>
-    {% endblock %}
+        </div>
+    </nav>
+{% endblock %}
 
-
+<div class="main-container">
     {% block content %}
     {% endblock %}
 </div>

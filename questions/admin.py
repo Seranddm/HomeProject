@@ -3,7 +3,7 @@ from .models import Question, Category, Comment, Answer
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text_of_question', 'author', )
+    list_display = ('text_of_question', 'author', 'is_published')
     list_display_links = ('text_of_question', )
     search_fields = ('text_of_question', )
 
