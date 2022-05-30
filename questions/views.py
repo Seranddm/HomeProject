@@ -180,7 +180,26 @@ class PersonalArea(ListView):
 
     def get_queryset(self):
         # Показываю вопросы конкретного пользователя
-        return Question.objects.filter(author=self.request.user)
+        if self.request.user.groups.filter(name='Обычный пользователь').exists():
+            return Question.objects.filter(author=self.request.user)
+        elif self.request.user.groups.filter(name='Администратор').exists():
+            return Question.objects.filter(author=self.request.user)
+        elif self.request.user.groups.filter(name='Тех. поддержка').exists():
+            return Question.objects.filter(answer__author=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.groups.filter(name='Обычный пользователь').exists():
+            context['header_query_set'] = 'Все ваши вопросы:'
+            context['if_not_query_set'] = 'Вы пока не задали ни одного вопроса'
+        elif self.request.user.groups.filter(name='Администратор').exists():
+            context['header_query_set'] = 'Все ваши вопросы:'
+            context['if_not_query_set'] = 'Вы пока не задали ни одного вопроса'
+        elif self.request.user.groups.filter(name='Тех. поддержка').exists():
+            context['header_query_set'] = 'Все ваши ответы:'
+            context['if_not_query_set'] = 'Вы пока не ответили ни на один вопрос'
+        return context
+
 
 
 def publish_question(request, pk):
