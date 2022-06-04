@@ -22,7 +22,7 @@ class Question(models.Model):
     author = models.ForeignKey(django.contrib.auth.models.User, on_delete=models.SET_NULL, verbose_name='Автор',
                                blank=True, null=True)
     category = models.ManyToManyField(Category, related_name='questions', verbose_name='Категория')
-    answer = models.OneToOneField('Answer', null=True, blank=True, on_delete=models.SET_NULL)
+    answer = models.OneToOneField('Answer', null=True, blank=True, on_delete=models.SET_NULL, related_name='question')
     text_of_question = models.TextField(verbose_name='Текст вопроса')
     is_published = models.BooleanField(verbose_name='Опубликовано?', default=False)
 

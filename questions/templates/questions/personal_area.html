@@ -63,6 +63,7 @@
                     {% endif %}
                     {% if not question.is_published and question.author == user %}
                         <a href="{% url 'publish_question' question.pk %}">Опубликовать</a>
+                        <a href="{% url 'delete_draft' question.pk %}">Удалить из черновиков</a>
                     {% endif %}
                 </div>
                 <div class="card-body">

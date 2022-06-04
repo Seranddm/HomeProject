@@ -9,6 +9,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import Group
 
+from django.contrib.auth.decorators import login_required, permission_required
+from django.utils.decorators import method_decorator
 
 class QuestionList(ListView):
     model = Question
@@ -34,100 +36,141 @@ class QuestionDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # переменная со списоком категорий
-        context['categories'] = SingleObjectMixin.get_object(self).category.all()
+        context['categories'] = self.get_object().category.all()
         return context
 
+@method_decorator(permission_required('questions.can_create_question'), name='dispatch')
+class AddQuestion(CreateView):
+   form_class = CreateQuestionForm
+   template_name = 'questions/create_question.html'
 
-# class AddQuestion(CreateView):
-#    form_class = CreateQuestionForm
-#    template_name = 'questions/create_question.html'
-
-
-def AddQuestion(request):
-    if request.method == 'POST':
-        form = CreateQuestionForm(request.POST)
-        if form.is_valid():
-            question = Question.objects.create()
-            question.category.set(form.cleaned_data['category'])
-            question.text_of_question = form.cleaned_data['text_of_question']
-            question.is_published = form.cleaned_data['is_published']
-            # связываю автора с вопросом
-            question.author = request.user
-            question.save()
-            # переадресую на вопрос
-            return redirect(question)
-    else:
-        form = CreateQuestionForm()
-    return render(request, 'questions/create_question.html', {'form': form})
+   def get_form_kwargs(self):
+       kwargs = super(AddQuestion, self).get_form_kwargs()
+       kwargs['user'] = self.request.user
+       return kwargs
 
 
-def AddAnswer(request, pk):
-    if request.method == 'POST':
-        form = CreateAnswerForm(request.POST)
-        if form.is_valid():
-            answer = Answer.objects.create(**form.cleaned_data)
-            answer.author = request.user
-            answer.save()
-            # связываю вопрос с ответом
-            question = Question.objects.get(pk=pk)
-            question.answer = answer
-            question.save()
-            # переадресую на вопрос
-            return redirect(question)
-    else:
-        form = CreateAnswerForm()
-    return render(request, 'questions/create_answer.html', {'form': form})
+# def AddQuestion(request):
+#     if request.method == 'POST':
+#         form = CreateQuestionForm(request.POST)
+#         if form.is_valid():
+#             question = Question.objects.create()
+#             question.category.set(form.cleaned_data['category'])
+#             question.text_of_question = form.cleaned_data['text_of_question']
+#             question.is_published = form.cleaned_data['is_published']
+#             # связываю автора с вопросом
+#             question.author = request.user
+#             question.save()
+#             # переадресую на вопрос
+#             return redirect(question)
+#     else:
+#         form = CreateQuestionForm()
+#     return render(request, 'questions/create_question.html', {'form': form})
+
+@method_decorator(permission_required('questions.can_create_answer'), name='dispatch')
+class AddAnswer(CreateView):
+   form_class = CreateAnswerForm
+   template_name = 'questions/create_answer.html'
+
+   def get_form_kwargs(self):
+       kwargs = super(AddAnswer, self).get_form_kwargs()
+       kwargs['user'] = self.request.user
+       kwargs['id_question'] = self.kwargs['pk']
+       return kwargs
+
+   def get_success_url(self, **kwargs):
+       return reverse_lazy('questionDetail', args=[self.object.question.pk])
 
 
-def AddComment(request, pk):
-    if request.method == 'POST':
-        form = CreateCommentForm(request.POST)
-        if form.is_valid():
-            # связываю вопрос с комментом
-            question = Question.objects.get(pk=pk)
-            form.cleaned_data['question'] = question
-            comment = Comment.objects.create(**form.cleaned_data)
-            comment.author = request.user
-            comment.save()
-            # переадресую на вопрос
-            return redirect(question)
-    else:
-        form = CreateCommentForm()
-    return render(request, 'questions/create_comment.html', {'form': form})
+# def AddAnswer(request, pk):
+#     if request.method == 'POST':
+#         form = CreateAnswerForm(request.POST)
+#         if form.is_valid():
+#             answer = Answer.objects.create(**form.cleaned_data)
+#             answer.author = request.user
+#             answer.save()
+#             # связываю вопрос с ответом
+#             question = Question.objects.get(pk=pk)
+#             question.answer = answer
+#             question.save()
+#             # переадресую на вопрос
+#             return redirect(question)
+#     else:
+#         form = CreateAnswerForm()
+#     return render(request, 'questions/create_answer.html', {'form': form})
+
+@method_decorator(permission_required('questions.can_create_comment'), name='dispatch')
+class AddComment(CreateView):
+   form_class = CreateCommentForm
+   template_name = 'questions/create_comment.html'
+
+   def get_form_kwargs(self):
+       kwargs = super(AddComment, self).get_form_kwargs()
+       kwargs['user'] = self.request.user
+       kwargs['id_question'] = self.kwargs['pk']
+       return kwargs
+
+   def get_success_url(self, **kwargs):
+       return reverse_lazy('questionDetail', args=[self.object.question.pk])
 
 
+# def AddComment(request, pk):
+#     if request.method == 'POST':
+#         form = CreateCommentForm(request.POST)
+#         if form.is_valid():
+#             # связываю вопрос с комментом
+#             question = Question.objects.get(pk=pk)
+#             form.cleaned_data['question'] = question
+#             comment = Comment.objects.create(**form.cleaned_data)
+#             comment.author = request.user
+#             comment.save()
+#             # переадресую на вопрос
+#             return redirect(question)
+#     else:
+#         form = CreateCommentForm()
+#     return render(request, 'questions/create_comment.html', {'form': form})
+
+@method_decorator(permission_required('questions.can_update_question'), name='dispatch')
 class UpdateQuestion(UpdateView):
     model = Question
     fields = ['category', 'text_of_question']
     template_name = 'questions/update_question.html'
 
-
+@method_decorator(permission_required('questions.can_update_answer'), name='dispatch')
 class UpdateAnswer(UpdateView):
     model = Answer
     fields = ['text_of_answer']
     template_name = 'questions/update_answer.html'
-    success_url = reverse_lazy('questionList')
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('questionDetail', args=[self.get_object().question.pk])
 
 
+@method_decorator(permission_required('questions.can_update_comment'), name='dispatch')
 class UpdateComment(UpdateView):
     model = Comment
     fields = ['text_of_comment']
     template_name = 'questions/update_comment.html'
-    success_url = reverse_lazy('questionList')
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('questionDetail', args=[self.get_object().question.pk])
 
 
+@method_decorator(permission_required('questions.can_delete_question'), name='dispatch')
 class DeleteQuestion(DeleteView):
     model = Question
     template_name = 'questions/delete_question.html'
     success_url = reverse_lazy('questionList')
 
 
+@method_decorator(permission_required('questions.can_delete_answer'), name='dispatch')
 class DeleteAnswer(DeleteView):
     model = Answer
     template_name = 'questions/delete_answer.html'
     success_url = reverse_lazy('questionList')
 
 
+@method_decorator(permission_required('questions.can_delete_comment'), name='dispatch')
 class DeleteComment(DeleteView):
     model = Comment
     template_name = 'questions/delete_comment.html'
@@ -167,12 +210,12 @@ def user_login(request):
         form = UserLoginForm()
     return render(request, 'questions/login.html', {'form': form})
 
-
+@login_required
 def user_logout(request):
     logout(request)
     return redirect('questionList')
 
-
+@method_decorator(login_required(), name='dispatch')
 class PersonalArea(ListView):
     model = Question
     context_object_name = 'questions'  # поменял переменную контекста (пока даст все объекты)
@@ -201,10 +244,18 @@ class PersonalArea(ListView):
         return context
 
 
-
+@permission_required('questions.can_create_question')
 def publish_question(request, pk):
     # для опубликования вопроса из черновиков
     question = Question.objects.get(pk=pk)
     question.is_published = True
     question.save()
     return redirect('personal-area')
+
+@permission_required('questions.can_create_question')
+def delete_draft(request, pk):
+    # для удаления вопроса из черновиков
+    question_draft = Question.objects.get(pk=pk)
+    question_draft.delete()
+    return redirect('personal-area')
+

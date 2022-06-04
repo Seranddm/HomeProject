@@ -3,10 +3,10 @@ from .views import *
 
 urlpatterns = [
     path('', QuestionList.as_view(), name='questionList'),
-    path('<int:pk>/', QuestionDetail.as_view(), name='questionDetail'),
-    path('add_question/', AddQuestion, name='addQuestion'),
-    path('add_answer/<int:pk>/', AddAnswer, name='addAnswer'),
-    path('add_comment/<int:pk>/', AddComment, name='addComment'),
+    path('question/<int:pk>/', QuestionDetail.as_view(), name='questionDetail'),
+    path('add_question/', AddQuestion.as_view(), name='addQuestion'),
+    path('add_answer/<int:pk>/', AddAnswer.as_view(), name='addAnswer'),
+    path('add_comment/<int:pk>/', AddComment.as_view(), name='addComment'),
     path('update_question/<int:pk>/', UpdateQuestion.as_view(), name='updateQuestion'),
     path('update_answer/<int:pk>/', UpdateAnswer.as_view(), name='updateAnswer'),
     path('update_comment/<int:pk>/', UpdateComment.as_view(), name='updateComment'),
@@ -19,5 +19,6 @@ urlpatterns = [
     path('logout/', user_logout, name='logout'),
     path('personal-area/', PersonalArea.as_view(), name='personal-area'),
     path('publish_question/<int:pk>/', publish_question, name='publish_question'),
+    path('delete-draft/<int:pk>/', delete_draft, name='delete_draft'),
 
 ]
