@@ -6,10 +6,17 @@
 
 {% block content %}
 
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-<button type="submit">Зарегистрироваться</button>
-</form>
+    {% if user.is_authenticated %}
+        <p>Чтобы зарегистрировать новую учетную запись, сначала нужно выйти из текущей </p>
+
+    {% else %}
+
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+
+    {% endif %}
 
 {% endblock %}

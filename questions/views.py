@@ -12,6 +12,8 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 
+from django.http import Http404
+
 class QuestionList(ListView):
     model = Question
     context_object_name = 'questions'  # поменял переменную контекста (пока даст все объекты)
@@ -130,13 +132,21 @@ class AddComment(CreateView):
 #         form = CreateCommentForm()
 #     return render(request, 'questions/create_comment.html', {'form': form})
 
-@method_decorator(permission_required('questions.can_update_question'), name='dispatch')
+
 class UpdateQuestion(UpdateView):
     model = Question
     fields = ['category', 'text_of_question']
     template_name = 'questions/update_question.html'
 
-@method_decorator(permission_required('questions.can_update_answer'), name='dispatch')
+    @method_decorator(permission_required('questions.can_update_question'))
+    def dispatch(self, request, *args, **kwargs):
+        if request.user == self.get_object().author or request.user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            raise Http404
+
+
+
 class UpdateAnswer(UpdateView):
     model = Answer
     fields = ['text_of_answer']
@@ -145,8 +155,15 @@ class UpdateAnswer(UpdateView):
     def get_success_url(self, **kwargs):
         return reverse_lazy('questionDetail', args=[self.get_object().question.pk])
 
+    @method_decorator(permission_required('questions.can_update_answer'))
+    def dispatch(self, request, *args, **kwargs):
+        if request.user == self.get_object().author or request.user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            raise Http404
 
-@method_decorator(permission_required('questions.can_update_comment'), name='dispatch')
+
+
 class UpdateComment(UpdateView):
     model = Comment
     fields = ['text_of_comment']
@@ -154,6 +171,13 @@ class UpdateComment(UpdateView):
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('questionDetail', args=[self.get_object().question.pk])
+
+    @method_decorator(permission_required('questions.can_update_comment'))
+    def dispatch(self, request, *args, **kwargs):
+        if request.user == self.get_object().author or request.user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            raise Http404
 
 
 @method_decorator(permission_required('questions.can_delete_question'), name='dispatch')
@@ -169,12 +193,17 @@ class DeleteAnswer(DeleteView):
     template_name = 'questions/delete_answer.html'
     success_url = reverse_lazy('questionList')
 
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('questionDetail', args=[self.get_object().question.pk])
+
 
 @method_decorator(permission_required('questions.can_delete_comment'), name='dispatch')
 class DeleteComment(DeleteView):
     model = Comment
     template_name = 'questions/delete_comment.html'
-    success_url = reverse_lazy('questionList')
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('questionDetail', args=[self.get_object().question.pk])
 
 
 class CategoryDetail(DetailView):
@@ -215,7 +244,7 @@ def user_logout(request):
     logout(request)
     return redirect('questionList')
 
-@method_decorator(login_required(), name='dispatch')
+@method_decorator(login_required, name='dispatch')
 class PersonalArea(ListView):
     model = Question
     context_object_name = 'questions'  # поменял переменную контекста (пока даст все объекты)
@@ -248,6 +277,8 @@ class PersonalArea(ListView):
 def publish_question(request, pk):
     # для опубликования вопроса из черновиков
     question = Question.objects.get(pk=pk)
+    if question.author != request.user:
+        raise Http404
     question.is_published = True
     question.save()
     return redirect('personal-area')
@@ -256,6 +287,8 @@ def publish_question(request, pk):
 def delete_draft(request, pk):
     # для удаления вопроса из черновиков
     question_draft = Question.objects.get(pk=pk)
+    if question_draft.author != request.user:
+        raise Http404
     question_draft.delete()
     return redirect('personal-area')
 
